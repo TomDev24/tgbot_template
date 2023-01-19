@@ -19,7 +19,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from tgbot.config import load_config
-from tgbot.models.db import db
+from tgbot.models.base import db
 
 dsn = load_config().db.dsn
 config.set_main_option('sqlalchemy.url', dsn)
