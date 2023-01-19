@@ -10,6 +10,11 @@ class DbConfig:
     user: str
     database: str
 
+    @property
+    def dsn(self):
+        url = 'postgresql://%s:%s@%s/%s' % (self.user, self.password, self.host, self.database)
+        return url
+
 
 @dataclass
 class TgBot:
