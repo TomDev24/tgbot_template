@@ -1,10 +1,11 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
+from tgbot.models.db import db
 from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
 from tgbot.handlers.admin import register_admin
@@ -14,14 +15,17 @@ from tgbot.middlewares.environment import EnvironmentMiddleware
 
 logger = logging.getLogger(__name__)
 
+async def setup_default_commands(dp: Dispatcher):
+    await dp.bot.set_my_commands([
+        types.BotCommand("start", "Start bot"),
+        types.BotCommand("about", "Info about bot"),
+    ])  
 
 def register_all_middlewares(dp, config):
     dp.setup_middleware(EnvironmentMiddleware(config=config))
 
-
 def register_all_filters(dp):
     dp.filters_factory.bind(AdminFilter)
-
 
 def register_all_handlers(dp):
     register_admin(dp)
@@ -49,6 +53,8 @@ async def main():
 
     # start
     try:
+        await db.set_bind(config.db.dsn)
+        await setup_default_commands(dp)
         await dp.start_polling()
     finally:
         await dp.storage.close()
